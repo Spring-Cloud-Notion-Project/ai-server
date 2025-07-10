@@ -1,5 +1,6 @@
 package ufrn.imd.ai_server;
 
+import com.fasterxml.jackson.databind.annotation.NoClass;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -10,8 +11,13 @@ public class ChatController {
         this.chatService = chatService;
     }
 
+    @PostMapping("/notion")
+    public String chatWithAINotion(@RequestBody NotionRequest notionRequest) {
+        return chatService.getNotionResponse(notionRequest);
+    }
+
     @PostMapping("/chat")
-    public String chatWithAI(@RequestBody String prompt) {
-        return chatService.getResponse(prompt);
+    public String chatWithAINotion(@RequestBody String prompt) {
+        return chatService.getChatResponse(prompt);
     }
 }

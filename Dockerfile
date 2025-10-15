@@ -11,6 +11,15 @@ RUN mvn package -DskipTests
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
+
+# instalar o Node.js e o npm para poder rodar comando npx
+USER root
+RUN apt-get update && \
+    apt-get install -y nodejs npm && \
+    npm install -g @notionhq/notion-mcp-server && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN addgroup --system spring && adduser --system --ingroup spring springuser
 USER springuser
 COPY --from=builder /app/target/*.jar app.jar

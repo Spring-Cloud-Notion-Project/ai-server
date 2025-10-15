@@ -1,5 +1,6 @@
-Crie um relatório com base na página do Notion abaixo:
+- Banco de dados no Notion: {page}
 
-- ID da Página: {page}
-- Objetivo do relatório: {goal}
-
+Com base nos dados presentas no banco de dados, faça o que se pede:
+"""
+{prompt}
+"""

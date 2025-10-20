@@ -3,18 +3,17 @@ package ufrn.imd.ai_server.controllers;
 import org.springframework.web.bind.annotation.*;
 import ufrn.imd.ai_server.services.ChatService;
 import ufrn.imd.ai_server.models.NotionRequest;
-import ufrn.imd.ai_server.models.Request;
-import ufrn.imd.ai_server.services.EmbeddingService;
+import ufrn.imd.ai_server.services.InvestmentsService;
 
 @RestController
 public class ChatController {
     private final ChatService chatService;
 
-    private final EmbeddingService embeddingService;
+    private final InvestmentsService investmentsService;
 
-    public ChatController(ChatService chatService, EmbeddingService embeddingService) {
+    public ChatController(ChatService chatService, InvestmentsService investmentsService) {
         this.chatService = chatService;
-        this.embeddingService = embeddingService;
+        this.investmentsService = investmentsService;
     }
 
     @PostMapping("/notion")
@@ -29,7 +28,11 @@ public class ChatController {
 
     @GetMapping("embedding")
     public String getEmbedding(@RequestParam String question) {
-        return embeddingService.findInvestments(question);
+        return investmentsService.findClosestMatch(question);
     }
 
+    @GetMapping("add-data")
+    public void addData(){
+        investmentsService.save(investmentsService.getInvestments());
+    }
 }

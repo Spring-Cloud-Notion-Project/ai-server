@@ -8,5 +8,4 @@ public interface ChatService {
 
     String getChatResponse(String prompt);
 
-    String getAIResponse(Request request);
 }

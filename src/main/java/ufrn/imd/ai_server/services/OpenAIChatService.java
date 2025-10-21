@@ -6,10 +6,13 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ufrn.imd.ai_server.models.NotionRequest;
 import ufrn.imd.ai_server.services.ChatService;
 import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
@@ -39,25 +42,25 @@ public class OpenAIChatService implements ChatService {
     }
 
     @Override
-    public String getNotionResponse(NotionRequest notionRequest) {
-        String aiResponse = chatClient.prompt()
-                .advisors(PromptChatMemoryAdvisor.builder(chatMemory).build(),new QuestionAnswerAdvisor(vectorStore))
+    public Flux<String> getNotionResponse(NotionRequest notionRequest) {
+        return chatClient.prompt()
+                .advisors(
+                        PromptChatMemoryAdvisor.builder(chatMemory).build(),
+                        new QuestionAnswerAdvisor(vectorStore)
+                )
                 .user(userSpec -> userSpec.text(userTemplate)
                         .param("page", notionRequest.page())
                         .param("prompt", notionRequest.prompt()))
-//                .system(systemSpec -> systemSpec
-//                        .text(systemTemplate))
-                .call().content();
-        //String aiResponse = "{\"teste\": \"Resposta da IA\"}";
-        return aiResponse;
+                .stream()
+                .content();
     }
 
-    @Override
-    public String getChatResponse(String prompt) {
-        String aiResponse = chatClient.prompt()
-                .user(prompt)
-                .call().content();
-        return aiResponse;
-    }
+//    @Override
+//    public String getChatResponse(String prompt) {
+//        String aiResponse = chatClient.prompt()
+//                .user(prompt)
+//                .call().content();
+//        return aiResponse;
+//    }
 
 }

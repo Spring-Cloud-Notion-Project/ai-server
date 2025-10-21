@@ -1,6 +1,7 @@
 package ufrn.imd.ai_server.controllers;
 
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import ufrn.imd.ai_server.services.ChatService;
 import ufrn.imd.ai_server.models.NotionRequest;
 import ufrn.imd.ai_server.services.InvestmentsService;
@@ -17,7 +18,7 @@ public class ChatController {
     }
 
     @PostMapping("/notion")
-    public String chatWithAINotion(@RequestBody NotionRequest notionRequest) {
+    public Flux<String> chatWithAINotion(@RequestBody NotionRequest notionRequest) {
         return chatService.getNotionResponse(notionRequest);
     }
 
@@ -26,13 +27,13 @@ public class ChatController {
 //        return chatService.getChatResponse(prompt);
 //    }
 
-    @GetMapping("embedding")
-    public String getEmbedding(@RequestParam String question) {
-        return investmentsService.findClosestMatch(question);
-    }
-
-    @GetMapping("add-data")
-    public void addData(){
-        investmentsService.save(investmentsService.getInvestments());
-    }
+//    @GetMapping("embedding")
+//    public String getEmbedding(@RequestParam String question) {
+//        return investmentsService.findClosestMatch(question);
+//    }
+//
+//    @GetMapping("add-data")
+//    public void addData(){
+//        investmentsService.save(investmentsService.getInvestments());
+//    }
 }

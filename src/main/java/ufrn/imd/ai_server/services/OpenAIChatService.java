@@ -17,50 +17,53 @@ import ufrn.imd.ai_server.models.NotionRequest;
 import ufrn.imd.ai_server.services.ChatService;
 import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
 
+import java.time.Duration;
+
 @Service
 public class OpenAIChatService implements ChatService {
-    private final ChatClient chatClient;
+        private final ChatClient chatClient;
 
-    private final VectorStore vectorStore;
+        private final VectorStore vectorStore;
 
-    ChatMemoryRepository chatMemoryRepository = new InMemoryChatMemoryRepository();
+        ChatMemoryRepository chatMemoryRepository = new InMemoryChatMemoryRepository();
 
-    ChatMemory chatMemory = MessageWindowChatMemory.builder()
-            .chatMemoryRepository(chatMemoryRepository)
-            .maxMessages(4)
-            .build();
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+                        .chatMemoryRepository(chatMemoryRepository)
+                        .maxMessages(4)
+                        .build();
 
-    @Value("classpath:prompt/PromptUser.st")
-    Resource userTemplate;
+        @Value("classpath:prompt/PromptUser.st")
+        Resource userTemplate;
 
-    @Value("classpath:prompt/PromptSystemMini.st")
-    Resource systemTemplate;
+        @Value("classpath:prompt/PromptSystemMini.st")
+        Resource systemTemplate;
 
-    public OpenAIChatService(ChatClient chatClient, VectorStore vectorStore) {
-        this.chatClient = chatClient;
-        this.vectorStore = vectorStore;
-    }
+        public OpenAIChatService(ChatClient chatClient, VectorStore vectorStore) {
+                this.chatClient = chatClient;
+                this.vectorStore = vectorStore;
+        }
 
-    @Override
-    public Flux<String> getNotionResponse(NotionRequest notionRequest) {
-        return chatClient.prompt()
-                .advisors(
-                        PromptChatMemoryAdvisor.builder(chatMemory).build(),
-                        new QuestionAnswerAdvisor(vectorStore)
-                )
-                .user(userSpec -> userSpec.text(userTemplate)
-                        .param("page", notionRequest.page())
-                        .param("prompt", notionRequest.prompt()))
-                .stream()
-                .content();
-    }
+//        public Flux<String> getNotionResponse(NotionRequest notionRequest) {
+//                return Flux.error(new RuntimeException("Erro Simulado: Falha na conexão com a OpenAI"));
+//        }
 
-//    @Override
-//    public String getChatResponse(String prompt) {
-//        String aiResponse = chatClient.prompt()
-//                .user(prompt)
-//                .call().content();
-//        return aiResponse;
-//    }
+        @Override
+        public Flux<String> getNotionResponse(NotionRequest notionRequest) {
+                return chatClient.prompt()
+                .advisors(PromptChatMemoryAdvisor.builder(chatMemory).build(), new QuestionAnswerAdvisor(vectorStore))
+                        .user(userSpec -> userSpec.text(userTemplate)
+                                .param("page", notionRequest.page())
+                                .param("prompt", notionRequest.prompt()))
+                        .stream()
+                        .content();
+        }
+
+        // @Override
+        // public String getChatResponse(String prompt) {
+        // String aiResponse = chatClient.prompt()
+        // .user(prompt)
+        // .call().content();
+        // return aiResponse;
+        // }
 
 }
